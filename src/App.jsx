@@ -37,7 +37,7 @@ function App() {
   const location = useLocation();
   const { user, loading } = useContext(AuthContext);
 
-  console.log('User in App:', user); // Verificamos el usuario aquí también
+  //console.log('User in App:', user); // Verificamos el usuario aquí también
 
   // Verificación del rol del usuario
   const isLoginPage = location.pathname.startsWith('/login');
