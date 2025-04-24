@@ -8,6 +8,7 @@ import UserDashboard from './pages/UserDashboard';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Wishlist from './pages/Wishlist';
+import TopProductos from './pages/MercadolibreTopProducts';
 import { AuthContext } from './context/AuthContext';
 
 // Layout Admin y páginas internas
@@ -55,6 +56,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login/*" element={<Login />} />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/topProducts" element={<TopProductos />}/>
+        
 
         {/* Dashboard de usuario */}
         <Route

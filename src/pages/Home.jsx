@@ -18,28 +18,33 @@ const categories = [
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 15;
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
-        setProducts(response.data);
+        const response = await axios.get(`http://localhost:5000/api/products?page=${currentPage}`);
+        const data = response.data;
+
+         // Accedé correctamente al array de productos
+        const productList = data?.data?.data || [];
+        const pages = data?.data?.total_pages || 1;
+
+        setProducts(productList); // evita error si no viene
+        setTotalPages(pages);
+        
       } catch (error) {
         console.error('Error al cargar productos:', error);
       }
     };
 
     fetchProducts();
-  }, []);
-
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  }, [currentPage]);
 
   const goToPage = (page) => {
-    setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   const addToWishlist = (product) => {
@@ -71,12 +76,11 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-center">
             <ul className="flex flex-wrap justify-center space-x-4 py-4 text-gray-700 font-semibold text-sm sm:text-base">
-              <li><Link to="/" className="text-blue-600 border-b-2 border-blue-600 pb-1">Home</Link></li>
-              <li><Link to="/deals" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Hot Deals</Link></li>
-              <li><Link to="/categories/laptops" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Laptops</Link></li>
-              <li><Link to="/categories/smartphones" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Smartphones</Link></li>
-              <li><Link to="/categories/cameras" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Cameras</Link></li>
-              <li><Link to="/categories/accessories" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Accessories</Link></li>
+              <li><Link to="/topProducts" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Top Smartphones</Link></li>
+              <li><Link to="/categories/notebooks" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Laptops</Link></li>
+              <li><Link to="/categories/celulares" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Smartphones</Link></li>
+              <li><Link to="/categories/cámaras" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Cámaras</Link></li>
+              <li><Link to="/categories/accessories" className="hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1">Accesorios</Link></li>
             </ul>
           </div>
         </div>
@@ -88,7 +92,7 @@ const Home = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Productos</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {currentProducts.map((product) => (
+            {products.map((product) => (
               <div
                 key={product._id}
                 className="bg-white rounded-lg shadow-2xl hover:shadow-2xl transition-all ease-in-out relative group"
@@ -98,8 +102,6 @@ const Home = () => {
                   alt={product.name}
                   className="w-full h-56 object-contain p-4 rounded-t-lg"
                 />
-
-                {/* Iconos flotantes al pasar el mouse */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center bg-opacity-20 backdrop-blur-sm p-4">
                   <div className="flex gap-3">
                     <Tippy content="Agregar a favoritos" animation="scale">
@@ -142,8 +144,16 @@ const Home = () => {
             ))}
           </div>
 
-          {/* Paginación */}
-          <div className="flex justify-center mt-8 space-x-2">
+          {/* Paginación con Anterior y Siguiente */}
+          <div className="flex justify-center mt-8 space-x-2 flex-wrap">
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+            >
+              ← Anterior
+            </button>
+
             {[...Array(totalPages)].map((_, index) => (
               <button
                 key={index}
@@ -157,6 +167,14 @@ const Home = () => {
                 {index + 1}
               </button>
             ))}
+
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+            >
+              Siguiente →
+            </button>
           </div>
         </div>
       </section>
