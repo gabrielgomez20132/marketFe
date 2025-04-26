@@ -1,7 +1,7 @@
 import axios from 'axios';
- // Cambia esto a la URL de tu API
+ //URL DESDE .ENV
  const API_URL = import.meta.env.VITE_API_URL;
-console.log(API_URL)
+ 
 
 export const loginUser = async (credentials) => {
     try {

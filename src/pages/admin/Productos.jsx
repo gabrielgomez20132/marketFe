@@ -1,28 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  getPaginationRowModel,
+} from '@tanstack/react-table';
+import { useNavigate } from 'react-router-dom';
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
   const fetchProductos = async (page = 1) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+      const endpoint = import.meta.env.VITE_API_URL_USER;
 
-      const response = await axios.get(`http://localhost:5000/api/products?page=${page}`, {
+      const response = await axios.get(`${endpoint}/products?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      const { data, current_page, total_pages } = response.data.data;
+      const resData = response.data.data;
 
-      setProductos(data);
-      setCurrentPage(current_page);
-      setTotalPages(total_pages);
+      setProductos(resData.data); // <--- productos está dentro de "data"
+      setCurrentPage(resData.current_page);
+      setTotalPages(resData.total_pages);
     } catch (error) {
       console.error('Error al obtener productos:', error);
     } finally {
@@ -34,61 +43,119 @@ const Productos = () => {
     fetchProductos(currentPage);
   }, [currentPage]);
 
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
     }
   };
 
-  return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Gestión de Productos</h2>
+  const columns = useMemo(
+    () => [
+      {
+        header: 'Nombre',
+        accessorKey: 'name',
+      },
+      {
+        header: 'Descripción',
+        accessorKey: 'description',
+      },
+      {
+        header: 'Categoría',
+        accessorKey: 'category.name',
+        cell: info => {
+          const value = info.getValue();
+          return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+        },
+      },
+      {
+        header: 'Precio',
+        accessorKey: 'price',
+        cell: info => `$${info.getValue()}`,
+      },
+      {
+        header: 'Stock',
+        accessorKey: 'stock',
+      },
+      {
+        header: 'SKU',
+        accessorKey: 'sku',
+      },
+      {
+        header: 'Acciones',
+        cell: () => (
+          <div className="space-x-2">
+            <button className="bg-blue-500 text-white px-3 py-1 rounded">Editar</button>
+            <button className="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
+  const table = useReactTable({
+    data: productos,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  return (
+    <div className="p-4 md:p-6 bg-white rounded-lg shadow max-w-screen">
+      <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+        <h2 className="text-xl md:text-2xl font-semibold">Gestión de Productos</h2>
+        <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"  onClick={() => navigate('/admin/productos/nuevo')}>
+          + Nuevo
+        </button>
+      </div>
+  
       {loading ? (
-        <p>Cargando productos...</p>
+        <p className="text-gray-500">Cargando productos...</p>
       ) : (
         <>
-          <table className="w-full border-collapse border border-gray-300">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="border border-gray-300 p-2 text-left">Descripción</th>
-                <th className="border border-gray-300 p-2 text-left">Categoria</th>
-                <th className="border border-gray-300 p-2 text-left">Precio</th>
-                <th className="border border-gray-300 p-2 text-left">Stock</th>
-                <th className="border border-gray-300 p-2 text-left">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productos.map((producto) => (
-                <tr key={producto._id}>
-                  <td className="border border-gray-300 p-2">{producto.description}</td>
-                  <td className="border border-gray-300 p-2">{producto.category.name[0].toLocaleUpperCase() + producto.category.name.slice(1).toLocaleLowerCase()}</td>
-                  <td className="border border-gray-300 p-2">${producto.price}</td>
-                  <td className="border border-gray-300 p-2">{producto.stock}</td>
-                  <td className="border border-gray-300 p-2">
-                    {/* Botones de acciones acá si querés */}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Paginación */}
-          <div className="flex justify-center mt-4 space-x-2">
+          <div className="w-full overflow-x-auto">
+            <table className="min-w-full table-auto border border-gray-300 text-sm">
+              <thead className="bg-gray-100">
+                {table.getHeaderGroups().map(headerGroup => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map(header => (
+                      <th key={header.id} className="px-4 py-2 border text-left">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map(row => (
+                  <tr key={row.id} className="hover:bg-gray-50">
+                    {row.getVisibleCells().map(cell => (
+                      <td key={cell.id} className="px-4 py-2 border whitespace-nowrap">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+  
+          {/* Paginación responsive */}
+          <div className="flex flex-wrap justify-center items-center gap-3 mt-6">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
             >
               Anterior
             </button>
-            <span className="px-3 py-1">
+            <span className="text-sm text-gray-600">
               Página {currentPage} de {totalPages}
             </span>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
             >
               Siguiente
             </button>
@@ -97,6 +164,7 @@ const Productos = () => {
       )}
     </div>
   );
+  
 };
 
 export default Productos;

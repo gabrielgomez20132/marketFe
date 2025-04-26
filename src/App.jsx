@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useContext } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
@@ -14,38 +14,24 @@ import { AuthContext } from './context/AuthContext';
 // Layout Admin y páginas internas
 import AdminLayout from './layouts/AdminLayout';
 import AdminHome from './pages/admin/AdminHome'; // Bienvenida al admin
+
 import Productos from './pages/admin/Productos';
+import ProductoCreate from './pages/admin/ProductoCreate';
 import Usuarios from './pages/admin/Usuarios';
 
-// Componente ProtectedRoute para proteger rutas
-const ProtectedRoute = ({ children, role }) => {
-  const { user } = useContext(AuthContext);
-  
-  console.log('User in ProtectedRoute:', user); // Verificamos el usuario
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  if (role && user.role.name !== role) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
-};
+import ProtectedRoute from './components/ProtectedRoute'; // Importa el ProtectedRoute
 
 function App() {
   const location = useLocation();
   const { user, loading } = useContext(AuthContext);
 
-  //console.log('User in App:', user); // Verificamos el usuario aquí también
+  if (loading) return null; // Spinner opcional
 
   // Verificación del rol del usuario
   const isLoginPage = location.pathname.startsWith('/login');
-  const isAdmin = user?.role?.name === 'admin';
-  const isUser = user?.role?.name === 'user';
-
-  if (loading) return null; // Spinner opcional
 
   return (
     <>
@@ -56,8 +42,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login/*" element={<Login />} />
         <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/topProducts" element={<TopProductos />}/>
-        
+        <Route path="/topProducts" element={<TopProductos />} />
 
         {/* Dashboard de usuario */}
         <Route
@@ -80,12 +65,15 @@ function App() {
         >
           <Route index element={<AdminHome />} />
           <Route path="productos" element={<Productos />} />
+          <Route path="productos/nuevo" element={<ProductoCreate />} />
           <Route path="usuarios" element={<Usuarios />} />
         </Route>
 
+        {/* Ruta para 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-
+      
+      <ToastContainer position="top-right" autoClose={3000} />
       <Footer />
     </>
   );
