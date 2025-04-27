@@ -7,6 +7,7 @@ import {
   getPaginationRowModel,
 } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
+import ProductoDelete from './ProductoDelete'; // Importamos ProductoDelete
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
@@ -82,15 +83,26 @@ const Productos = () => {
       },
       {
         header: 'Acciones',
-        cell: () => (
-          <div className="space-x-2">
-            <button className="bg-blue-500 text-white px-3 py-1 rounded">Editar</button>
-            <button className="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const productId = row.original._id; // Obtén el id del producto desde la fila
+          return (
+            <div className="space-x-2">
+              <button
+                className="bg-blue-500 text-white px-3 py-1 rounded"
+                onClick={() => navigate(`/admin/productos/editar/${productId}`)} // Redirigir a la página de edición
+              >
+                Editar
+              </button>
+              <ProductoDelete 
+                productId={productId} 
+                onDelete={() => fetchProductos(currentPage)} // Llamamos a onDelete para refrescar la lista
+              />
+            </div>
+          );
+        },
       },
     ],
-    []
+    [currentPage]
   );
 
   const table = useReactTable({
@@ -104,11 +116,11 @@ const Productos = () => {
     <div className="p-4 md:p-6 bg-white rounded-lg shadow max-w-screen">
       <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
         <h2 className="text-xl md:text-2xl font-semibold">Gestión de Productos</h2>
-        <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"  onClick={() => navigate('/admin/productos/nuevo')}>
+        <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" onClick={() => navigate('/admin/productos/nuevo')}>
           + Nuevo
         </button>
       </div>
-  
+
       {loading ? (
         <p className="text-gray-500">Cargando productos...</p>
       ) : (
@@ -139,7 +151,7 @@ const Productos = () => {
               </tbody>
             </table>
           </div>
-  
+
           {/* Paginación responsive */}
           <div className="flex flex-wrap justify-center items-center gap-3 mt-6">
             <button
@@ -164,7 +176,6 @@ const Productos = () => {
       )}
     </div>
   );
-  
 };
 
 export default Productos;

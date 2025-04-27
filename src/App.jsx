@@ -1,6 +1,9 @@
 // src/App.jsx
 import React, { useContext } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import Home from './pages/Home';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
@@ -17,12 +20,11 @@ import AdminHome from './pages/admin/AdminHome'; // Bienvenida al admin
 
 import Productos from './pages/admin/Productos';
 import ProductoCreate from './pages/admin/ProductoCreate';
+import ProductoEdit from './pages/admin/ProductoEdit';
 import Usuarios from './pages/admin/Usuarios';
 
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
 import ProtectedRoute from './components/ProtectedRoute'; // Importa el ProtectedRoute
+import ProductoDelete from './pages/admin/ProductoDelete';
 
 function App() {
   const location = useLocation();
@@ -66,6 +68,7 @@ function App() {
           <Route index element={<AdminHome />} />
           <Route path="productos" element={<Productos />} />
           <Route path="productos/nuevo" element={<ProductoCreate />} />
+          <Route path="productos/editar/:id" element={<ProductoEdit />} />
           <Route path="usuarios" element={<Usuarios />} />
         </Route>
 
