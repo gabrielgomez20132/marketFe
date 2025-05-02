@@ -1,30 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { WishlistContext } from '../context/WishlistContext';
 
 const Wishlist = () => {
-    console.log("Wishlist renderizado");
-  const [wishlist, setWishlist] = useState([]);
-
-  useEffect(() => {
-    // Cargar wishlist desde el localStorage
-    const storedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-    console.log("Wishlist cargado desde localStorage:", storedWishlist); // Esto te mostrará el estado inicial
-    console.log(localStorage.getItem('wishlist'));
-    setWishlist(storedWishlist);
-  }, []);
-
-  // Función para eliminar un producto del wishlist
-  const removeFromWishlist = (productId) => {
-    const updatedWishlist = wishlist.filter(item => item._id !== productId);
-    setWishlist(updatedWishlist);
-    localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
-  };
+  console.log("Wishlist renderizado");
+  const { wishlist, removeFromWishlist } = useContext(WishlistContext);
 
   return (
-    <div className="bg-gray-100">
-      <section className="py-16 bg-white">
+    <div className="bg-gray-100 min-h-screen flex flex-col"> {/* min-h-screen y flex para asegurar que el contenido llene la pantalla */}
+      <section className="py-16 bg-white flex-grow"> {/* flex-grow permite que esta sección crezca para llenar el espacio restante */}
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Mi Wishlist</h2>
+
           {wishlist.length === 0 ? (
             <p className="text-center text-gray-600">Tu wishlist está vacío</p>
           ) : (
@@ -38,15 +25,18 @@ const Wishlist = () => {
                     <span className="text-green-600 font-bold text-xl">${product.price}</span>
                   </div>
                   <button onClick={() => removeFromWishlist(product._id)} className="mt-4 w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition">
-                    Eliminar del wishlist
+                    Eliminar
                   </button>
                 </div>
               ))}
             </div>
           )}
-          <Link to="/" className="mt-8 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
-            Volver a la tienda
-          </Link>
+          
+          <div className="flex justify-center mt-8">
+            <Link to="/" className="inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
+              Volver a la tienda
+            </Link>
+          </div>
         </div>
       </section>
     </div>

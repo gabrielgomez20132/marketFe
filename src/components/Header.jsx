@@ -1,24 +1,31 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { WishlistContext } from '../context/WishlistContext';
+import { CartContext } from '../context/CartContext';
+
 
 const Header = () => {
-  const [wishlistCount, setWishlistCount] = useState(0);
-  const [cartCount, setCartCount] = useState(3); // Simulado, podés conectarlo con Context después
+  //const [wishlistCount, setWishlistCount] = useState(0);
+  //const [cartCount, setCartCount] = useState(3); // Simulado, podés conectarlo con Context después
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  //const { wishlistCount, setWishlistCount } = useContext(WishlistContext);
+  const { wishlistCount } = useContext(WishlistContext);
+  const { cartCount} = useContext(CartContext);
+
   const isAdmin = user?.role?.name === 'admin';
 
-  useEffect(() => {
-    const storedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-    setWishlistCount(storedWishlist.length);
-  }, []);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleMenuClick = () => {
+    setIsMenuOpen(false); // Cierra el menú al hacer clic en un enlace
   };
 
   return (
@@ -43,8 +50,11 @@ const Header = () => {
             <Link to="/" className="text-2xl font-bold text-blue-700">MarketApp</Link>
           </div>
 
+          <form className="flex w-full max-w-md">
+            {/* aquí tu select/input/botón */}
+          </form>
           {/* Search */}
-          {!isAdmin && (
+          {/* {!isAdmin && (
             <div className="hidden md:flex justify-center">
               <form className="flex w-full max-w-md">
                 <select className="border border-gray-300 rounded-l px-3 text-gray-600">
@@ -65,7 +75,7 @@ const Header = () => {
                 </button>
               </form>
             </div>
-          )}
+          )} */}
           
           {/* Right Side */}
           <div className="flex justify-end items-center gap-4 text-sm text-gray-700 relative">
@@ -81,13 +91,17 @@ const Header = () => {
                   )}
                 </Link>
 
-                <div className="relative">
+                <Link to="/cartlist" className="relative">
+                <div className="relative flex items-center">
                   <i className="fa fa-shopping-cart text-xl"></i>
                   <span className="ml-1">Cart</span>
                   {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">{cartCount}</span>
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
+                      {cartCount}
+                    </span>
                   )}
                 </div>
+              </Link>
               </>
             )}
 
@@ -102,10 +116,14 @@ const Header = () => {
                 {isMenuOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
                     {!isAdmin && (
-                      <Link to="/user-dashboard" className="block px-4 py-2 hover:bg-gray-100">Mi cuenta</Link>
+                      <>
+                      <Link to="/user-dashboard" className="block px-4 py-2 hover:bg-gray-100"  onClick={handleMenuClick}>Mi perfil</Link>
+                      <Link to="/" className="block px-4 py-2 hover:bg-gray-100"  onClick={handleMenuClick}>Mis compras</Link>
+                      </>
+                      
                     )}
                     {isAdmin && (
-                      <Link to="/admin" className="block px-4 py-2 hover:bg-gray-100">Panel Administrador</Link>
+                      <Link to="/admin" className="block px-4 py-2 hover:bg-gray-100"  onClick={handleMenuClick}>Panel Administrador</Link>
                     )}
                     <button
                       onClick={handleLogout}

@@ -25,6 +25,7 @@ import Usuarios from './pages/admin/Usuarios';
 
 import ProtectedRoute from './components/ProtectedRoute'; // Importa el ProtectedRoute
 import ProductoDelete from './pages/admin/ProductoDelete';
+import CartList from './pages/CartList';
 
 function App() {
   const location = useLocation();
@@ -44,6 +45,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login/*" element={<Login />} />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/cartlist" element={<CartList />} />
         <Route path="/topProducts" element={<TopProductos />} />
 
         {/* Dashboard de usuario */}

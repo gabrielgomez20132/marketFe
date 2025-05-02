@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import { WishlistContext } from '../context/WishlistContext';
+import { CartContext } from '../context/CartContext';  // Importamos el useCart
+import { CartProvider } from '../context/CartContext';  // Importamos el useCart
+import ShowProduct from './ShowProduct';
+ 
 import product01 from '../assets/img/product01.png';
 import product02 from '../assets/img/product02.png';
 import product03 from '../assets/img/product03.png';
@@ -15,15 +19,35 @@ const categories = [
   { name: 'Cámaras', image: product03 },
 ];
 
+
+
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [selectedProduct, setSelectedProduct] = useState(null);//ver más
+  const [showModal, setShowModal] = useState(false); 
+  
+  
+  const { addToWishlist, isInWishlist, removeFromWishlist } = useContext(WishlistContext);
+  const { addToCart, cart , isInCartList} = useContext(CartContext);
+  
+  const openQuickView = (product) => {
+    console.log('entro');
+    setSelectedProduct(product);
+    setShowModal(true);
+  };
+
+  const closeQuickView = () => {
+    setSelectedProduct(null);
+    setShowModal(false);
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/products?page=${currentPage}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL_USER}/products?page=${currentPage}`);
         const data = response.data;
 
          // Accedé correctamente al array de productos
@@ -47,22 +71,7 @@ const Home = () => {
     }
   };
 
-  const addToWishlist = (product) => {
-    const storedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-    if (!storedWishlist.some(item => item._id === product._id)) {
-      storedWishlist.push(product);
-      localStorage.setItem('wishlist', JSON.stringify(storedWishlist));
-    }
-  };
-
-  const addToCart = (product) => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    if (!storedCart.some(item => item._id === product._id)) {
-      storedCart.push({ ...product, quantity: 1 });
-      localStorage.setItem('cart', JSON.stringify(storedCart));
-    }
-  };
-
+  
   return (
     <div className="bg-gray-100">
       {/* Hero */}
@@ -106,24 +115,25 @@ const Home = () => {
                   <div className="flex gap-3">
                     <Tippy content="Agregar a favoritos" animation="scale">
                       <button
-                        onClick={() => addToWishlist(product)}
+                        onClick={() => isInWishlist(product._id) ? removeFromWishlist(product._id) : addToWishlist(product)}
                         className="bg-white p-3 rounded-full shadow hover:bg-gray-100 transition transform active:scale-95 duration-150"
-                      >
-                        <i className="fas fa-heart text-gray-700"></i>
+                        >
+                        <i className={`fas fa-heart ${isInWishlist(product._id) ? 'text-red-600' : 'text-gray-700'}`}></i>
                       </button>
                     </Tippy>
 
                     <Tippy content="Agregar al carrito" animation="scale">
                       <button
-                        onClick={() => addToCart(product)}
+                        onClick={() => addToCart(product)}  // Llamar a addToCart desde el CartContext
                         className="bg-white p-3 rounded-full shadow hover:bg-gray-100 transition transform active:scale-95 duration-150"
                       >
-                        <i className="fas fa-shopping-cart text-gray-700"></i>
+                        <i className={`fas fa-shopping-cart ${isInCartList(product._id) ? 'text-blue-500' : 'text-gray-700'}`}></i>
                       </button>
                     </Tippy>
 
                     <Tippy content="Vista rápida" animation="scale">
-                      <button className="bg-white p-3 rounded-full shadow hover:bg-gray-100 transition transform active:scale-95 duration-150">
+                      <button 
+                        onClick={() => openQuickView(product)} className="bg-white p-3 rounded-full shadow hover:bg-gray-100 transition transform active:scale-95 duration-150">
                         <i className="fas fa-eye text-gray-700"></i>
                       </button>
                     </Tippy>
@@ -200,6 +210,10 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {showModal && (
+        <ShowProduct product={selectedProduct} onClose={closeQuickView} />
+      )}
     </div>
   );
 };
