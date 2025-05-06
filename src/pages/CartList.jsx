@@ -1,34 +1,52 @@
 import React, { useContext, useState } from 'react';
 import { CartContext } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext'; 
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
 const CartList = () => {
-  const { cart, removeFromCart, updateQuantity } = useContext(CartContext);
+  const { cart, removeFromCart, updateQuantity, discount, applyDiscount } = useContext(CartContext);
+  const { token } = useContext(AuthContext); 
   const [discountCode, setDiscountCode] = useState('');
-  const [appliedDiscount, setAppliedDiscount] = useState(0);
+  const [discountError, setDiscountError] = useState('');
+  const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
 
   const handleApplyDiscount = () => {
     if (discountCode.trim().toLowerCase() === 'descuento10') {
-      setAppliedDiscount(0.1);
+      applyDiscount(0.1);
+      setDiscountError('');
     } else {
-      setAppliedDiscount(0);
-      alert('Código no válido');
-    }
-  };
-
-  const handleCheckout = () => {
-    const user = JSON.parse(localStorage.getItem('user')); // o 'token', depende de cómo manejes auth
-    if (!user) {
-      navigate('/login'); // redirige a login si no está logueado
-    } else {
-      navigate('/checkout'); // o el flujo de pago que tengas
+      applyDiscount(0);
+      setDiscountError('Código no válido');
     }
   };
 
   const subtotal = cart.reduce((total, product) => total + product.price * product.quantity, 0);
-  const discountAmount = subtotal * appliedDiscount;
+  const discountAmount = subtotal * discount;
   const total = subtotal - discountAmount;
+
+  const handleSaveCart = async () => {
+    const cartData = {
+      items: cart.map(item => ({
+        productId: item._id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      discount: discount,
+    };
+
+    try {
+      const endpoint = import.meta.env.VITE_API_URL_USER;
+      await axios.post(`${endpoint}/save-cart`, cartData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error('Error guardando el carrito:', error);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -43,7 +61,6 @@ const CartList = () => {
         </div>
       ) : (
         <>
-          {/* Tu lista de productos... */}
           <div className="space-y-6">
             {cart.map((product) => (
               <div key={product._id} className="flex items-center justify-between bg-white p-4 rounded-lg shadow-md">
@@ -59,7 +76,12 @@ const CartList = () => {
                   <input
                     type="number"
                     value={product.quantity}
-                    onChange={(e) => updateQuantity(product._id, parseInt(e.target.value))}
+                    onChange={(e) => {
+                      const quantity = parseInt(e.target.value);
+                      if (!isNaN(quantity) && quantity > 0) {
+                        updateQuantity(product._id, quantity);
+                      }
+                    }}
                     className="w-16 p-2 text-center border rounded-md"
                     min="1"
                   />
@@ -74,7 +96,6 @@ const CartList = () => {
             ))}
           </div>
 
-          {/* Código de descuento */}
           <div className="mt-10 max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold mb-4">¿Tienes un código de descuento?</h3>
             <div className="flex gap-4">
@@ -92,18 +113,18 @@ const CartList = () => {
                 Aplicar
               </button>
             </div>
-            {appliedDiscount > 0 && (
+            {discountError && <p className="text-red-500 mt-2">{discountError}</p>}
+            {discount > 0 && (
               <p className="text-green-600 mt-2 font-semibold">
-                ¡Código aplicado! {appliedDiscount * 100}% de descuento.
+                ¡Código aplicado! {discount * 100}% de descuento.
               </p>
             )}
           </div>
 
-          {/* Totales y botones */}
           <div className="mt-10 flex flex-col items-end space-y-4">
             <div className="text-right">
               <p className="text-gray-700">Subtotal: <span className="font-bold">${subtotal.toFixed(2)}</span></p>
-              {appliedDiscount > 0 && (
+              {discount > 0 && (
                 <p className="text-green-600">Descuento: -${discountAmount.toFixed(2)}</p>
               )}
               <h3 className="text-2xl font-bold mt-2">Total: ${total.toFixed(2)}</h3>
@@ -116,12 +137,20 @@ const CartList = () => {
               >
                 Seguir comprando
               </Link>
-              <button
-                onClick={handleCheckout}
+
+              {/* <button
+                onClick={handleSaveCart}
+                className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition"
+              >
+                Guardar Carrito
+              </button> */}
+              
+              <Link
+                to="/checkout"
                 className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition"
               >
                 Iniciar pago
-              </button>
+              </Link>
             </div>
           </div>
         </>

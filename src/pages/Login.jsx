@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
 import { Link } from 'react-router-dom';
-//import { GoogleLogin } from 'react-google-login'; // Si estás usando una librería de Google Login
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
   const { login, isAuthenticated } = useContext(AuthContext);
@@ -23,7 +24,7 @@ const Login = () => {
     if (success) {
       navigate('/admin'); // Redirige al panel de administración si el login es exitoso
     } else {
-      alert('Credenciales inválidas');
+      toast.error('Credenciales Invalidas');
     }
   };
 
@@ -35,6 +36,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+       <ToastContainer />
       {/* Botón para volver al inicio */}
       <div className="mb-8">
         <Link to="/" className="text-3xl font-bold text-blue-700">
@@ -79,37 +81,12 @@ const Login = () => {
           Iniciar sesión
         </button>
 
-        {/* Separador para opciones de login */}
-        <div className="flex items-center my-4">
-          <hr className="flex-grow border-gray-300" />
-          <span className="px-2 text-gray-500">O</span>
-          <hr className="flex-grow border-gray-300" />
+        <div className="text-center mt-4">
+          <span className="text-gray-600">¿No tienes cuenta? </span>
+          <Link to="/register" className="text-blue-600 hover:underline font-semibold">
+            Regístrate
+          </Link>
         </div>
-
-        {/* Botón de Iniciar sesión con Google */}
-        <button
-          type="button"
-          disabled
-          className="w-full flex items-center justify-center bg-red-300 text-gray-500 font-semibold py-2 rounded-md transition duration-200 cursor-not-allowed"
-        >
-          <svg
-            className="g-icon h-5 w-5 mr-3"
-            aria-hidden="true"
-          >
-            <use href="/static/prod/f/202504281115-7611864f2a/icons/sprite.svg#icon-logo-google"></use>
-          </svg>
-          Iniciar sesión con Google
-        </button>
-        {/* <GoogleLogin
-          onSuccess={handleGoogleLogin}
-          onError={(error) => console.log(error)}
-          useOneTap // Opcional, para mostrar el inicio de sesión con un solo clic
-          shape="rectangular"
-          size="large"
-          width="100%"
-          text="signin_with"
-          theme="outline"
-        /> */}
         
       </form>
     </div>

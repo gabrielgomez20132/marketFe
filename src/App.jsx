@@ -8,79 +8,96 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import UserDashboard from './pages/UserDashboard';
+import UserOrders from './pages/UserOrders';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Wishlist from './pages/Wishlist';
 import TopProductos from './pages/MercadolibreTopProducts';
 import { AuthContext } from './context/AuthContext';
 
-// Layout Admin y páginas internas
 import AdminLayout from './layouts/AdminLayout';
-import AdminHome from './pages/admin/AdminHome'; // Bienvenida al admin
-
+import AdminHome from './pages/admin/AdminHome';
 import Productos from './pages/admin/Productos';
 import ProductoCreate from './pages/admin/ProductoCreate';
 import ProductoEdit from './pages/admin/ProductoEdit';
 import Usuarios from './pages/admin/Usuarios';
-
-import ProtectedRoute from './components/ProtectedRoute'; // Importa el ProtectedRoute
-import ProductoDelete from './pages/admin/ProductoDelete';
+import ProtectedRoute from './components/ProtectedRoute';
 import CartList from './pages/CartList';
+import Checkout from './pages/Checkout';
+import OrderSuccess from './pages/OrderSuccess';
+import Categorias from './pages/admin/Categorias';
+import UsuarioCreate from './pages/admin/UsuarioCreate';
+import UsuarioEdit from './pages/admin/UsuarioEdit';
+import Register from './pages/Register';
 
 function App() {
   const location = useLocation();
   const { user, loading } = useContext(AuthContext);
 
-  if (loading) return null; // Spinner opcional
+  if (loading) return null;
 
-  // Verificación del rol del usuario
-  const isLoginPage = location.pathname.startsWith('/login');
+  const isAuthPage = ['/login', '/register'].some((path) =>
+    location.pathname.startsWith(path)
+  );
 
   return (
-    <>
-      {/* No mostrar Header y Footer en la página de login */}
-      {!isLoginPage && <Header />}
-      
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login/*" element={<Login />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/cartlist" element={<CartList />} />
-        <Route path="/topProducts" element={<TopProductos />} />
+    <div className="flex flex-col min-h-screen">
+      {!isAuthPage && <Header />}
 
-        {/* Dashboard de usuario */}
-        <Route
-          path="/user-dashboard"
-          element={
-            <ProtectedRoute role="user">
-              <UserDashboard />
-            </ProtectedRoute>
-          }
-        />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login/*" element={<Login />} />
+          <Route path="/register/*" element={<Register />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/cartlist" element={<CartList />} />
+          <Route path="/topProducts" element={<TopProductos />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
 
-        {/* Panel Admin con rutas protegidas y layout lateral */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute role="admin">
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<AdminHome />} />
-          <Route path="productos" element={<Productos />} />
-          <Route path="productos/nuevo" element={<ProductoCreate />} />
-          <Route path="productos/editar/:id" element={<ProductoEdit />} />
-          <Route path="usuarios" element={<Usuarios />} />
-        </Route>
+          <Route
+            path="/user-profile"
+            element={
+              <ProtectedRoute role="user">
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user-orders"
+            element={
+              <ProtectedRoute role="user">
+                <UserOrders />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute role="admin">
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AdminHome />} />
+            <Route path="productos" element={<Productos />} />
+            <Route path="productos/nuevo" element={<ProductoCreate />} />
+            <Route path="productos/editar/:id" element={<ProductoEdit />} />
 
-        {/* Ruta para 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      
+            <Route path="usuarios" element={<Usuarios />} />
+            <Route path="usuarios/nuevo" element={<UsuarioCreate />} />
+            <Route path="usuarios/editar/:id" element={<UsuarioEdit />} />
+
+            <Route path="categorias" element={<Categorias />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+
+      {!isAuthPage && <Footer />}
       <ToastContainer position="top-right" autoClose={3000} />
-      <Footer />
-    </>
+    </div>
   );
 }
 

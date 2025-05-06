@@ -22,6 +22,7 @@ const ProtectedRoute = ({ children, role }) => {
     return <Navigate to="/login" replace />;
   }
 
+  
   // Si el rol del usuario no coincide con el rol esperado
   if (role && user.role.name.toLowerCase() !== role.toLowerCase()) {
     return <Navigate to="/" replace />;

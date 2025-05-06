@@ -41,11 +41,11 @@ const ShowProduct = ({ product, onClose }) => {
           </div>
         </div>
 
-        {product.rating && (
+        {/* {product.rating && (
           <div className="mt-4 text-yellow-600 font-bold text-center">
             ⭐ {product.rating} / 5
           </div>
-        )}
+        )} */}
 
         {/* Info de tarjetas y cuotas */}
         <div className="mt-6 border-t pt-4">

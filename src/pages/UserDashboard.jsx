@@ -7,17 +7,16 @@ import {
   Grid,
   Paper,
   Alert,
-  CircularProgress,
-  Stack
+  Stack,
+  Box
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// Esquema de validación con Yup
+// Esquema de validación con Yup (aunque no se usará ya que los campos son solo de lectura)
 const schema = yup.object().shape({
   nombre: yup.string().required('El nombre es obligatorio'),
   apellido: yup.string().required('El apellido es obligatorio'),
@@ -29,16 +28,13 @@ const schema = yup.object().shape({
 });
 
 const UserDashboard = () => {
-  const { user, token, setUser } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);  // Accede al usuario desde el contexto
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
   const [serverMsg, setServerMsg] = useState({ type: '', text: '' });
 
   const {
     register,
-    handleSubmit,
-    formState: { errors },
     reset
   } = useForm({
     defaultValues: {
@@ -53,52 +49,28 @@ const UserDashboard = () => {
     resolver: yupResolver(schema)
   });
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    setServerMsg({ type: '', text: '' });
-
-    try {
-      const API_URL = import.meta.env.VITE_API_URL_USER;
-      const endpoint = `${API_URL}/users/${user._id}`;
-
-      const response = await axios.put(endpoint, data, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      setUser(response.data);           // Actualiza el contexto los datos del usuario
-      reset(response.data);             // Actualiza los valores del formulario
-      setServerMsg({ type: 'success', text: 'Perfil actualizado exitosamente' });
-    } catch (error) {
-      const msg = error.response?.data?.message || 'Error al actualizar el perfil';
-      setServerMsg({ type: 'error', text: msg });
-      console.error('Error del backend:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleBack = () => {
-    navigate('/');
+    navigate('/'); // Redirige a la página principal
   };
 
   return (
     <Container maxWidth="sm" sx={{ mt: 6 }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
         <Typography variant="h5" gutterBottom>
-          Editar Perfil
+          Ver Perfil
         </Typography>
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <form noValidate>
           <Grid container spacing={2}>
-            {[
+            {[ 
               { label: 'Nombre', name: 'nombre' },
               { label: 'Apellido', name: 'apellido' },
               { label: 'DNI', name: 'dni' },
               { label: 'Dirección', name: 'direccion' },
               { label: 'Código Postal', name: 'codigo_postal' },
-              { label: 'Nombre de Usuario', name: 'username' },
+              { label: 'Nombre de Usuario', name: 'username' }, 
               { label: 'Email', name: 'email', type: 'email' }
-            ].map(({ label, name, type = 'text' }) => (
+            ].map(({ label, name, type = 'text', disabled = true }) => (
               <Grid item xs={12} key={name}>
                 <TextField
                   label={label}
@@ -106,33 +78,10 @@ const UserDashboard = () => {
                   fullWidth
                   variant="outlined"
                   {...register(name)}
-                  error={!!errors[name]}
-                  helperText={errors[name]?.message}
+                  disabled={disabled} // Todos los campos están deshabilitados
                 />
               </Grid>
             ))}
-
-            <Grid item xs={12}>
-              <Stack spacing={2} direction="row">
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                >
-                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Actualizar'}
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleBack}
-                  disabled={loading}
-                >
-                  Volver
-                </Button>
-              </Stack>
-            </Grid>
           </Grid>
         </form>
 
@@ -142,6 +91,20 @@ const UserDashboard = () => {
           </Alert>
         )}
       </Paper>
+
+      {/* Los botones fuera del Paper, centrados y alineados abajo */}
+      <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
+        <Stack spacing={2} direction="row">
+          {/* Botón para volver */}
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleBack} // Redirige a la página principal
+          >
+            Volver
+          </Button>
+        </Stack>
+      </Box>
     </Container>
   );
 };

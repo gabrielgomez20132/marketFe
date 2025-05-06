@@ -4,13 +4,13 @@ import React, { createContext, useState, useEffect } from 'react';
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  // ✅ Cargar carrito desde localStorage al iniciar directamente en useState
+  // ✅ Cargar carrito desde localStorage al iniciar
   const [cart, setCart] = useState(() => {
     const storedCart = localStorage.getItem('cart');
     return storedCart ? JSON.parse(storedCart) : [];
   });
 
-  // ✅ Guardar cambios en carrito al localStorage cada vez que cambia
+  // ✅ Guardar cambios del carrito en localStorage
   useEffect(() => {
     try {
       localStorage.setItem('cart', JSON.stringify(cart));
@@ -18,6 +18,26 @@ export const CartProvider = ({ children }) => {
       console.error('Error guardando carrito en localStorage', error);
     }
   }, [cart]);
+
+  // ✅ Cargar descuento desde localStorage al iniciar
+  const [discount, setDiscount] = useState(() => {
+    const storedDiscount = localStorage.getItem('discount');
+    return storedDiscount ? JSON.parse(storedDiscount) : 0;
+  });
+
+  // ✅ Guardar descuento en localStorage cuando cambia
+  useEffect(() => {
+    try {
+      localStorage.setItem('discount', JSON.stringify(discount));
+    } catch (error) {
+      console.error('Error guardando descuento en localStorage', error);
+    }
+  }, [discount]);
+
+  // Aplicar descuento (porcentaje en decimal, ej: 0.1 = 10%)
+  const applyDiscount = (percentage) => {
+    setDiscount(percentage);
+  };
 
   // Agregar producto al carrito
   const addToCart = (product) => {
@@ -35,30 +55,49 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  // Eliminar producto del carrito
+  // Eliminar producto
   const removeFromCart = (productId) => {
     setCart(prevCart => prevCart.filter(item => item._id !== productId));
   };
 
-  // Actualizar cantidad de un producto en el carrito
+  // Actualizar cantidad
   const updateQuantity = (productId, quantity) => {
-    setCart(prevCart => 
+    setCart(prevCart =>
       prevCart.map(item =>
         item._id === productId ? { ...item, quantity: Math.max(1, quantity) } : item
       )
     );
   };
 
-  // Verificar si producto está en el carrito
+  // Verificar si un producto ya está
   const isInCartList = (productId) => {
     return cart.some(item => item._id === productId);
   };
 
-  // Calcular el total de productos en el carrito
+  // Contar total de ítems
   const cartCount = cart.reduce((total, product) => total + product.quantity, 0);
 
+  // Limpiar carrito
+  const clearCart = () => {
+    setCart([]); // Limpiar el estado del carrito
+    localStorage.removeItem('cart'); // Eliminar el carrito del localStorage
+    setDiscount(0); // Restablecer el descuento
+    localStorage.removeItem('discount'); // Eliminar el descuento de localStorage
+  };
+
   return (
-    <CartContext.Provider value={{ cart, cartCount, addToCart, removeFromCart, updateQuantity, isInCartList }}>
+    <CartContext.Provider value={{
+      cart,
+      cartCount,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      isInCartList,
+      discount,
+      applyDiscount,
+      setDiscount,
+      clearCart
+    }}>
       {children}
     </CartContext.Provider>
   );

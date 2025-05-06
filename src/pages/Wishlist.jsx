@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { WishlistContext } from '../context/WishlistContext';
 
 const Wishlist = () => {
-  console.log("Wishlist renderizado");
+  
   const { wishlist, removeFromWishlist } = useContext(WishlistContext);
 
   return (

@@ -5,10 +5,9 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { WishlistContext } from '../context/WishlistContext';
-import { CartContext } from '../context/CartContext';  // Importamos el useCart
-import { CartProvider } from '../context/CartContext';  // Importamos el useCart
+import { CartContext } from '../context/CartContext';
 import ShowProduct from './ShowProduct';
- 
+
 import product01 from '../assets/img/product01.png';
 import product02 from '../assets/img/product02.png';
 import product03 from '../assets/img/product03.png';
@@ -19,22 +18,19 @@ const categories = [
   { name: 'Cámaras', image: product03 },
 ];
 
-
-
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");  // Estado para la búsqueda
 
-  const [selectedProduct, setSelectedProduct] = useState(null);//ver más
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [showModal, setShowModal] = useState(false); 
-  
   
   const { addToWishlist, isInWishlist, removeFromWishlist } = useContext(WishlistContext);
   const { addToCart, cart , isInCartList} = useContext(CartContext);
-  
+
   const openQuickView = (product) => {
-    console.log('entro');
     setSelectedProduct(product);
     setShowModal(true);
   };
@@ -50,11 +46,10 @@ const Home = () => {
         const response = await axios.get(`${import.meta.env.VITE_API_URL_USER}/products?page=${currentPage}`);
         const data = response.data;
 
-         // Accedé correctamente al array de productos
         const productList = data?.data?.data || [];
         const pages = data?.data?.total_pages || 1;
 
-        setProducts(productList); // evita error si no viene
+        setProducts(productList);
         setTotalPages(pages);
         
       } catch (error) {
@@ -71,7 +66,11 @@ const Home = () => {
     }
   };
 
-  
+  // Filtrar productos en base al término de búsqueda
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="bg-gray-100">
       {/* Hero */}
@@ -98,10 +97,24 @@ const Home = () => {
       {/* Listado de productos */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Productos</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Listado de Productos</h2>
+
+          {/* Buscador */}
+          <div className="mb-8 text-center">
+            <div className="relative inline-block w-72">
+              <input
+                type="text"
+                placeholder="Buscar por Nombre, Marca . . ."
+                className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <div
                 key={product._id}
                 className="bg-white rounded-lg shadow-2xl hover:shadow-2xl transition-all ease-in-out relative group"
@@ -117,14 +130,14 @@ const Home = () => {
                       <button
                         onClick={() => isInWishlist(product._id) ? removeFromWishlist(product._id) : addToWishlist(product)}
                         className="bg-white p-3 rounded-full shadow hover:bg-gray-100 transition transform active:scale-95 duration-150"
-                        >
+                      >
                         <i className={`fas fa-heart ${isInWishlist(product._id) ? 'text-red-600' : 'text-gray-700'}`}></i>
                       </button>
                     </Tippy>
 
                     <Tippy content="Agregar al carrito" animation="scale">
                       <button
-                        onClick={() => addToCart(product)}  // Llamar a addToCart desde el CartContext
+                        onClick={() => addToCart(product)}
                         className="bg-white p-3 rounded-full shadow hover:bg-gray-100 transition transform active:scale-95 duration-150"
                       >
                         <i className={`fas fa-shopping-cart ${isInCartList(product._id) ? 'text-blue-500' : 'text-gray-700'}`}></i>
@@ -147,7 +160,7 @@ const Home = () => {
                     <span className="text-green-600 font-bold text-xl">${product.price}</span>
                   </div>
                   <span className="mt-2 inline-block bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded">
-                    ⭐ {product.rating} / 5
+                    ⭐ {product.sku}
                   </span>
                 </div>
               </div>
@@ -168,11 +181,7 @@ const Home = () => {
               <button
                 key={index}
                 onClick={() => goToPage(index + 1)}
-                className={`px-4 py-2 rounded-full ${
-                  currentPage === index + 1
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                className={`px-4 py-2 rounded-full ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
               >
                 {index + 1}
               </button>

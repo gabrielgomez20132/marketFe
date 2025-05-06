@@ -1,10 +1,14 @@
 // src/context/AuthContext.jsx
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect,useContext } from 'react';
 import { loginUser } from '../services/authService';
+import { WishlistContext } from './WishlistContext';
+import { CartContext } from './CartContext';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const { clearWishlist } = useContext(WishlistContext);
+  const { clearCart } = useContext(CartContext);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -43,6 +47,8 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     setUser(null);
     setToken(null);
+    clearWishlist();//limpio favoritos
+    clearCart();//limpio carrito
   };
 
   return (

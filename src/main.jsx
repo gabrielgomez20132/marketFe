@@ -10,13 +10,13 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <WishlistProvider>
-          <CartProvider>
-            <App />
-          </CartProvider>
-        </WishlistProvider>
-      </AuthProvider>
+      <WishlistProvider> {/* WishlistProvider debe estar encima de AuthProvider */}
+        <CartProvider>
+          <AuthProvider>
+              <App />
+          </AuthProvider>
+        </CartProvider>
+      </WishlistProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
