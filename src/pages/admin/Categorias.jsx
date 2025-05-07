@@ -20,7 +20,7 @@ const Categorias = () => {
     try {
       setLoading(true);
       
-      const endpoint = import.meta.env.VITE_API_URL_USER;
+      const endpoint = import.meta.env.VITE_API_URL;
 
       const response = await axios.get(`${endpoint}/categories`, {
         headers: {

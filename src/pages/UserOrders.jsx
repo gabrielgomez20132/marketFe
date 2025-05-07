@@ -31,7 +31,7 @@ const UserOrders = () => {
       setErrorMsg('');
 
       try {
-        const API_URL = import.meta.env.VITE_API_URL_USER;
+        const API_URL = import.meta.env.VITE_API_URL;
         const endpoint = `${API_URL}/orders/user/${user._id}`;
 
         const { data } = await axios.get(endpoint, {

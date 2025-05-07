@@ -20,7 +20,7 @@ const Productos = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const endpoint = import.meta.env.VITE_API_URL_USER;
+      const endpoint = import.meta.env.VITE_API_URL;
 
       const response = await axios.get(`${endpoint}/products?page=${page}`, {
         headers: {

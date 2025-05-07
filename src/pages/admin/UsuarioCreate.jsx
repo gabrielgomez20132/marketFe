@@ -14,7 +14,7 @@ const UsuarioCreate = () => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const endpoint = import.meta.env.VITE_API_URL_USER;
+  const endpoint = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchRoles = async () => {

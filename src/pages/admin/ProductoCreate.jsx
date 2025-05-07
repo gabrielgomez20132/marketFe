@@ -13,7 +13,7 @@ const ProductoCreate = () => {
   const [error, setError] = useState('');
 
   const { token } = useContext(AuthContext);
-  const endpoint = import.meta.env.VITE_API_URL_USER;
+  const endpoint = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
   useEffect(() => {

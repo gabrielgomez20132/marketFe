@@ -11,7 +11,7 @@ const CategoriaEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
-  const endpoint = import.meta.env.VITE_API_URL_USER;
+  const endpoint = import.meta.env.VITE_API_URL;
 
   const [categoria, setCategoria] = useState(null);
   const [loading, setLoading] = useState(false);

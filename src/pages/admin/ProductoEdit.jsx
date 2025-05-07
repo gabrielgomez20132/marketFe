@@ -14,7 +14,7 @@ const ProductoEdit = () => {
   const [error, setError] = useState('');
 
   const { token } = useContext(AuthContext);
-  const endpoint = import.meta.env.VITE_API_URL_USER;
+  const endpoint = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { id } = useParams(); // Para obtener el ID del producto a editar
 

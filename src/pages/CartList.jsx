@@ -37,7 +37,7 @@ const CartList = () => {
     };
 
     try {
-      const endpoint = import.meta.env.VITE_API_URL_USER;
+      const endpoint = import.meta.env.VITE_API_URL;
       await axios.post(`${endpoint}/save-cart`, cartData, {
         headers: {
           Authorization: `Bearer ${token}`,

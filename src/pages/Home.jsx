@@ -43,7 +43,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL_USER}/products?page=${currentPage}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/products?page=${currentPage}`);
         const data = response.data;
 
         const productList = data?.data?.data || [];

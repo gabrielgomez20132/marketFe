@@ -9,7 +9,7 @@ const RoleDelete = ({ roleId, onDelete }) => {
 
   const handleDelete = async () => {
     try {
-      const endpoint = import.meta.env.VITE_API_URL_USER;
+      const endpoint = import.meta.env.VITE_API_URL;
 
       const response = await axios.delete(`${endpoint}/roles/${roleId}`, {
         headers: {

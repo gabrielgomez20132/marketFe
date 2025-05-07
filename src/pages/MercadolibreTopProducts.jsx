@@ -8,7 +8,7 @@ const ProductList = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const endpoint = `${import.meta.env.VITE_API_URL_USER}/top-products`;
+  const endpoint = `${import.meta.env.VITE_API_URL}/top-products`;
 
   useEffect(() => {
     axios.get(endpoint)

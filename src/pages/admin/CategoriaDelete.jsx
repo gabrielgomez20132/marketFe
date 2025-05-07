@@ -8,7 +8,7 @@ const CategoriaDelete = ({ categoryId, onDelete }) => {
 
   const handleDelete = async () => {
     try {
-      const endpoint = import.meta.env.VITE_API_URL_USER;
+      const endpoint = import.meta.env.VITE_API_URL;
 
       const response = await axios.patch(`${endpoint}/categories/${categoryId}`, { isActive: false }, {
         headers: {

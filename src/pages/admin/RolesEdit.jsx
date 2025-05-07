@@ -14,7 +14,7 @@ const RolesEdit = () => {
 
   const fetchRol = async () => {
     try {
-      const endpoint = import.meta.env.VITE_API_URL_USER;
+      const endpoint = import.meta.env.VITE_API_URL;
       const res = await axios.get(`${endpoint}/roles`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -27,7 +27,7 @@ const RolesEdit = () => {
 
   const fetchPermisos = async () => {
     try {
-      const endpoint = import.meta.env.VITE_API_URL_USER;
+      const endpoint = import.meta.env.VITE_API_URL;
       const res = await axios.get(`${endpoint}/permissions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -51,7 +51,7 @@ const RolesEdit = () => {
 
     setError(null); // Limpiar el error si se seleccionó un permiso válido
     try {
-      const endpoint = import.meta.env.VITE_API_URL_USER;
+      const endpoint = import.meta.env.VITE_API_URL;
       await axios.put(
         `${endpoint}/roles/${id}/add-permission`,
         { permissionId: permisoSeleccionado },

@@ -17,7 +17,7 @@ const RoleCreate = () => {
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
-        const endpoint = import.meta.env.VITE_API_URL_USER;
+        const endpoint = import.meta.env.VITE_API_URL;
         const res = await axios.get(`${endpoint}/permissions`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -55,7 +55,7 @@ const RoleCreate = () => {
     }
 
     try {
-      const endpoint = import.meta.env.VITE_API_URL_USER;
+      const endpoint = import.meta.env.VITE_API_URL;
       await axios.post(
         `${endpoint}/roles`,
         {

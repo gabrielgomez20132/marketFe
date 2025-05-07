@@ -12,8 +12,8 @@ const CategoriaCreate = () => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const endpoint = import.meta.env.VITE_API_URL_USER;
-  
+  const endpoint = import.meta.env.VITE_API_URL;
+
   const validationSchema = Yup.object({
     name: Yup.string().required('Campo obligatorio'),
     description: Yup.string().required('Campo obligatorio'),

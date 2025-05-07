@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const Register = () => {
   const navigate = useNavigate();
 
-  const API_URL = import.meta.env.VITE_API_URL_USER;
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const [form, setForm] = useState({
     username: '',
