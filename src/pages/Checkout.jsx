@@ -1,40 +1,37 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Checkout = () => {
   const { cart, discount, clearCart, setDiscount } = useContext(CartContext);
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { token } = useContext(AuthContext); 
 
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
+  // Si el usuario no está logueado, redirige a /login
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  // Mientras se redirige, no renderizar nada
+  if (!user) return null;
 
   const handleCheckout = async () => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-
-    if (!storedUser || !token) {
-      navigate('/login');
-      return;
-    }
-
     const orderData = {
-      user: storedUser._id,
+      user: user._id,
       items: cart.map(item => ({
         product: item._id,
         quantity: item.quantity,
         price: item.price,
       })),
       paymentMethod: 'credit_card',
-      shippingAddress: storedUser.direccion,
+      shippingAddress: user.direccion,
       coupon: discount > 0 ? { code: 'descuento10', discount: discount * 100 } : null,
     };
 
@@ -49,18 +46,12 @@ const Checkout = () => {
         },
       });
 
-      
-      clearCart();       // Limpiar el carrito
-      setDiscount(0);    // Reiniciar el descuento
+      clearCart();
+      setDiscount(0);
       setLoading(false);
 
-      
       toast.success('¡Compra realizada con éxito!');
-      // Redirigir al inicio después de mostrar el toast
-      setTimeout(() => {
-        navigate('/');     // Redirigir al inicio después de un pequeño retraso
-      }, 2000);
-
+      setTimeout(() => navigate('/'), 2000);
     } catch (error) {
       console.error('Error al crear la orden:', error);
       setLoading(false);
