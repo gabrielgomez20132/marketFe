@@ -160,7 +160,7 @@ const Home = () => {
                     <span className="text-green-600 font-bold text-xl">${product.price}</span>
                   </div>
                   <span className="mt-2 inline-block bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded">
-                    ⭐ {product.sku}
+                  📦 SKU {product.sku}
                   </span>
                 </div>
               </div>

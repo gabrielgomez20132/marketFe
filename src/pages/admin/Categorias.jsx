@@ -1,11 +1,11 @@
 // pages/admin/Categorias.jsx
 import React, { useEffect, useState, useMemo, useContext } from 'react';
 import axios from 'axios';
+import CategoriaDelete from './CategoriaDelete';
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
-  getPaginationRowModel,
 } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -13,32 +13,24 @@ import { AuthContext } from '../../context/AuthContext';
 const Categorias = () => {
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const { token } = useContext(AuthContext); 
-  
 
-  const fetchCategorias = async (page = 1) => {
+  const fetchCategorias = async () => {
     try {
       setLoading(true);
       
       const endpoint = import.meta.env.VITE_API_URL_USER;
-      
-      
+
       const response = await axios.get(`${endpoint}/categories`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      
-      const resData = response;
-      
-
-      setCategorias(resData.data);
-      setCurrentPage(resData.current_page);
-      setTotalPages(resData.total_pages);
+      /* console.log('Categorías:', response.data); */
+      const resData = response.data.data ?? response.data;
+      setCategorias(resData);
     } catch (error) {
       console.error('Error al obtener categorías:', error);
     } finally {
@@ -47,14 +39,8 @@ const Categorias = () => {
   };
 
   useEffect(() => {
-    fetchCategorias(currentPage);
-  }, [currentPage]);
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
+    fetchCategorias();
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -78,39 +64,26 @@ const Categorias = () => {
               >
                 Editar
               </button>
-              <button
-                className="bg-red-500 text-white px-3 py-1 rounded"
-                onClick={async () => {
-                  try {
-                    const token = localStorage.getItem('token');
-                    const endpoint = import.meta.env.VITE_API_URL_USER;
-                    await axios.delete(`${endpoint}/categories/${categoryId}`, {
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                      },
-                    });
-                    fetchCategorias(currentPage);
-                  } catch (err) {
-                    console.error('Error al eliminar categoría:', err);
-                  }
-                }}
-              >
-                Eliminar
-              </button>
+
+              <CategoriaDelete 
+                categoryId={categoryId} 
+                onDelete={() => fetchCategorias()} 
+              />
             </div>
           );
         },
       },
     ],
-    [currentPage]
+    []
   );
 
   const table = useReactTable({
     data: categorias,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   });
+
+  /* console.log('Filas renderizadas:', table.getRowModel().rows.map(r => r.original.name)); */
 
   return (
     <div className="p-4 md:p-6 bg-white rounded-lg shadow max-w-screen">
@@ -118,9 +91,9 @@ const Categorias = () => {
         <h2 className="text-xl md:text-2xl font-semibold">Gestión de Categorías</h2>
         <button
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          onClick={() => navigate('/admin/categorias/nueva')}
+          onClick={() => navigate('/admin/categorias/nuevo')}
         >
-          + Nueva
+          + Nuevo
         </button>
       </div>
 
@@ -154,8 +127,6 @@ const Categorias = () => {
               </tbody>
             </table>
           </div>
-
-          
         </>
       )}
     </div>

@@ -1,6 +1,7 @@
 // pages/admin/Usuarios.jsx
 import React, { useEffect, useState, useMemo, useContext } from 'react';
 import axios from 'axios';
+import UsuarioDelete from './UsuarioDelete';
 import {
   useReactTable,
   getCoreRowModel,
@@ -73,10 +74,6 @@ const Usuarios = () => {
         accessorKey: 'role.name',
       },
       {
-        header: 'ID',
-        accessorKey: '_id',
-      },
-      {
         header: 'Acciones',
         cell: ({ row }) => {
           const userId = row.original._id;
@@ -88,24 +85,8 @@ const Usuarios = () => {
               >
                 Editar
               </button>
-              <button
-                className="bg-red-500 text-white px-3 py-1 rounded"
-                onClick={async () => {
-                  try {
-                    const endpoint = import.meta.env.VITE_API_URL_USER;
-                    await axios.delete(`${endpoint}/users/${userId}`, {
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                      },
-                    });
-                    fetchUsuarios(currentPage);
-                  } catch (err) {
-                    console.error('Error al eliminar usuario:', err);
-                  }
-                }}
-              >
-                Eliminar
-              </button>
+              
+              <UsuarioDelete userId={userId} onDelete={() => fetchUsuarios(currentPage)} />
             </div>
           );
         },

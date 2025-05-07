@@ -26,9 +26,14 @@ import CartList from './pages/CartList';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import Categorias from './pages/admin/Categorias';
+import CategoriaCreate from './pages/admin/CategoriaCreate';
+import CategoriaEdit from './pages/admin/CategoriaEdit';
 import UsuarioCreate from './pages/admin/UsuarioCreate';
 import UsuarioEdit from './pages/admin/UsuarioEdit';
 import Register from './pages/Register';
+import Roles from './pages/admin/Roles';
+import RolesEdit from './pages/admin/RolesEdit';
+import RoleCreate from './pages/admin/RoleCreate';
 
 function App() {
   const location = useLocation();
@@ -88,7 +93,16 @@ function App() {
             <Route path="usuarios/nuevo" element={<UsuarioCreate />} />
             <Route path="usuarios/editar/:id" element={<UsuarioEdit />} />
 
+            <Route path="roles" element={<Roles />} />
+            <Route path="roles/editar/:id" element={<RolesEdit />} />
+            <Route path="roles/nuevo" element={<RoleCreate />} />
+
+            
+
             <Route path="categorias" element={<Categorias />} />
+            <Route path="categorias/editar/:id" element={<CategoriaEdit />} />
+            <Route path="categorias/nuevo" element={<CategoriaCreate />} />
+            
           </Route>
 
           <Route path="*" element={<NotFound />} />

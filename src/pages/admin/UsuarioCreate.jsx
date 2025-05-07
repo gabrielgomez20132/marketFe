@@ -23,8 +23,8 @@ const UsuarioCreate = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         // Filtrar solo admin y user
-        const filtered = res.data.filter(r => ['admin', 'user'].includes(r.name));
-        setRoles(filtered);
+        //const filtered = res.data.filter(r => ['admin', 'user'].includes(r.name));
+        setRoles(res.data);
       } catch (err) {
         toast.error('Error al cargar roles');
       }

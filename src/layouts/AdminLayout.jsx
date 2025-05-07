@@ -12,6 +12,7 @@ const AdminLayout = () => {
           <Link to="/admin/productos" className="hover:bg-gray-700 p-2 rounded">Productos</Link>
           <Link to="/admin/usuarios" className="hover:bg-gray-700 p-2 rounded">Usuarios</Link>
           <Link to="/admin/categorias" className="hover:bg-gray-700 p-2 rounded">Categorías</Link>
+          <Link to="/admin/roles" className="hover:bg-gray-700 p-2 rounded">Roles y Permisos</Link>
           {/* Agrega más links aquí */}
         </nav>
       </aside>
